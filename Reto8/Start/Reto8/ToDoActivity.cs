@@ -16,6 +16,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.MobileServices;
 using reto8;
+using reto8.Services;
+using Android;
 
 #if OFFLINE_SYNC_ENABLED
 using Microsoft.WindowsAzure.MobileServices.Sync;
@@ -229,6 +231,53 @@ namespace reto8
             builder.SetTitle(title);
             builder.Create().Show();
         }
+
+		// Define a authenticated user.
+		private MobileServiceUser user;
+		private async Task<bool> Authenticate()
+		{
+			var success = false;
+			try
+			{
+				// Sign in with Facebook login using a server-managed flow.
+				user = await client.LoginAsync(this,
+					MobileServiceAuthenticationProvider.Facebook);
+				CreateAndShowDialog(string.Format("you are now logged in - {0}",
+					user.UserId), "Logged in!");
+
+				success = true;
+			}
+			catch (Exception ex)
+			{
+				CreateAndShowDialog(ex, "Authentication failed");
+			}
+			try
+			{
+				ServiceHelper serviceHelper = new ServiceHelper();
+				string AndroidId = Android.Provider.Settings.Secure.GetString(ContentResolver, Android.Provider.Settings.Secure.AndroidId);
+
+				await serviceHelper.InsertarEntidad("merolhack@gmail.com", "Reto8 + " + user.UserId, AndroidId);
+			}
+			catch (Exception exc)
+			{
+				CreateAndShowDialog(exc, "ServiceHelper failed");
+			}
+			return success;
+		}
+
+		[Java.Interop.Export()]
+		public async void LoginUser(View view)
+		{
+			// Load data only after authentication succeeds.
+			if (await Authenticate())
+			{
+				//Hide the button after authentication succeeds.
+				FindViewById<Button>(Resource.Id.buttonLoginUser).Visibility = ViewStates.Gone;
+
+				// Load the data.
+				OnRefreshItemsSelected();
+			}
+		}
     }
 }
 

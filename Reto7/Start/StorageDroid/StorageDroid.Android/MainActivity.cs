@@ -5,6 +5,8 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
+using StorageDroid.Services;
+using Android;
 
 namespace StorageDroid.Droid
 {
@@ -27,8 +29,23 @@ namespace StorageDroid.Droid
 
         private async void Button_Click(object sender, EventArgs e)
         {
+            string emailRegistro = "merolhack@gmail.com";
+            string codigoReto = "Reto7" + emailRegistro;
+
             StorageDroid.StorageService storageSvc = new StorageService();
-            await storageSvc.performBlobOperation("dxaudmx@microsoft.com");           
+            await storageSvc.performBlobOperation(emailRegistro);
+
+			try
+			{
+				ServiceHelper serviceHelper = new ServiceHelper();
+				string AndroidId = Android.Provider.Settings.Secure.GetString(ContentResolver, Android.Provider.Settings.Secure.AndroidId);
+
+				await serviceHelper.InsertarEntidad(emailRegistro, codigoReto, AndroidId);
+			}
+			catch (Exception exc)
+			{
+				string msgError = exc.Message;
+			}
         }
     }
 }

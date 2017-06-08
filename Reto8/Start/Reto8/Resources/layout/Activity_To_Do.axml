@@ -39,6 +39,12 @@
             android:layout_height="wrap_content"
             android:onClick="AddItem"
             android:text="@string/add_button_text" />
+        <Button
+            android:id="@+id/buttonLoginUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="LoginUser"
+            android:text="@string/login_button_text" />
     </LinearLayout>
     <ListView
         android:id="@+id/listViewToDo"
